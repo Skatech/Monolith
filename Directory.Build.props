@@ -1,0 +1,8 @@
+<Project>
+  <PropertyGroup>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <BaseIntermediateOutputPath>.out\obj\</BaseIntermediateOutputPath>
+    <OutputPath>.out\</OutputPath>
+    <PublishDir>.publish\</PublishDir>
+  </PropertyGroup>
+</Project>

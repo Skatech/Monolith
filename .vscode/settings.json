@@ -1,0 +1,12 @@
+{
+  "files.exclude": {
+    "**/.vscode": false,
+    "**/.git": true,
+    "**/.out": true,
+    "**/.publish": true,
+    "**/.idea": true,
+    "**/*.csproj": false,
+    "**/*.sln": true,
+    "**/Directory.Build.props": true
+  }
+}

@@ -1,0 +1,47 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/.out/Monolith.dll",
+            "args": [],
+            // "args": ["backup"],
+            // "args": ["backup", "SYNCTESTS"],
+            // "args": ["backup", "APPDATA\\localhive"],
+            // "args": ["sync"],
+            // "args": ["sync", "SYNCTESTS", "--ignore"],
+            // "args": ["sync", "SYNCTESTS", "--ignore-global"],
+            // "args": ["sync", "SYNCTESTS", "--index-edit"],
+            // "args": ["sync", "SYNCTESTS", "--index-pack"],
+            // "args": ["sync", "SYNCTESTS", "*", "-d"],
+            // "args": ["sync", "SYNCTESTS/myindex.csv"],
+            // "args": ["sync", "SYNCTESTS", "-pu"],
+            // "args": ["flake"],
+            // "args": ["flake", "FLAKETESTS\\*", "--ignore"],
+            // "args": ["flake", "FLAKETESTS\\*", "-u"],
+            // "args": ["flake", "FLAKETESTS\\*", "-nu=ec"],
+            // "args": ["doc"],
+            // "args": ["doc", "abc", "def"],
+            // "args": ["doc", "list"],
+            // "args": ["doc", "sync", "-n"],
+            // "args": ["doc", "nts"],
+            // "args": ["doc", "index"],
+            // "args": ["doc", "edit-index"],
+            // "args": ["doc", "nts", "http:"],
+            // "args": ["doc", "nts", "http:", "UTF-8"],
+            "env": { "MONOLITH_APPDATA": "./APPDATA" },
+            "cwd": "${workspaceFolder}/.out/",
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "stopAtEntry": false
+        },
+        {
+            "name": "Attach",
+            "type": "coreclr",
+            "request": "attach"
+        }
+    ]
+}
