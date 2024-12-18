@@ -39,9 +39,14 @@ class OperationGroup {
 
     public static string ApplicationDataDirectory =>
         _appdatadir ?? throw new InvalidOperationException(
-            $"Application data directory must be set before first access.");
+            $"Application data directory must be set before");
 
     public static void SetApplicationDataDirectory(string path) {
         Directory.CreateDirectory(_appdatadir = Path.GetFullPath(path, Environment.CurrentDirectory));
+    }
+
+    ///<summary>Return path to global or local file list</summary>
+    public static string GetPath(string fileName, string? directoryOrNullForGlobal = null) {
+        return Path.Combine(directoryOrNullForGlobal ?? ApplicationDataDirectory, fileName);
     }
 }

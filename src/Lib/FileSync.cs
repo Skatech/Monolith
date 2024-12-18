@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Skatech.ComponentArchitecture;
 
 namespace Skatech.IO;
 
@@ -269,11 +270,11 @@ class FileSyncIndex {
     public static FileList LoadCombinedIgnoreList(string workingDir) {
         CreateIgnoreList(out string globalFileListPath);
         return FileList.FromFiles(globalFileListPath,
-            FileList.GetPath(IgnoreListFileName, workingDir));
+            OperationGroup.GetPath(IgnoreListFileName, workingDir));
     }
 
     static bool CreateIgnoreList(out string filePath, string? directoryOrNullForGlobal = null) {
-        if (File.Exists(filePath = FileList.GetPath(IgnoreListFileName, directoryOrNullForGlobal)))
+        if (File.Exists(filePath = OperationGroup.GetPath(IgnoreListFileName, directoryOrNullForGlobal)))
             return false;
         string commentText = "file ignore list for sync utility, add lines with file names or patterns";
         return directoryOrNullForGlobal is null

@@ -17,7 +17,7 @@ internal static class UtilityHP {
         else Console.WriteLine("HP Utility, usage:\r\n  hp string [string [string ...]]");
     }
     
-    private  static int GetHashCodeLegacyX86(string str) {
+    public static int GetHashCodeLegacyX86(string str) {
         int acc1 = (5381 << 16) + 5381;
         int acc2 = acc1;
         for (int i = 0; i < str.Length; ++i) {

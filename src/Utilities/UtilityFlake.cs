@@ -2,6 +2,7 @@
 using System.IO;
 using System.Text;
 using Skatech.IO;
+using Skatech.ComponentArchitecture;
 
 namespace Skatech.Monolith.Utilities;
 
@@ -113,11 +114,11 @@ internal static class UtilityFlake {
     static FileList LoadCombinedIgnoreList(string workingDir) {
         CreateIgnoreList(out string globalFileListPath);
         return FileList.FromFiles(globalFileListPath,
-            FileList.GetPath(IgnoreListFileName, workingDir));
+            OperationGroup.GetPath(IgnoreListFileName, workingDir));
     }
 
     static bool CreateIgnoreList(out string filePath, string? directoryOrNullForGlobal = null) {
-        if (File.Exists(filePath = FileList.GetPath(IgnoreListFileName, directoryOrNullForGlobal)))
+        if (File.Exists(filePath = OperationGroup.GetPath(IgnoreListFileName, directoryOrNullForGlobal)))
             return false;
         string commentText = "file ignore list for flake utility, add lines with file names or patterns";
         return directoryOrNullForGlobal is null

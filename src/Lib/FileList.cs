@@ -38,10 +38,4 @@ class FileList {
         File.WriteAllLines(filePath, lines, Encoding.UTF8);
         return true;
     }
-
-    ///<summary>Return path to global or local file list</summary>
-    public static string GetPath(string fileName, string? directoryOrNullForGlobal = null) {
-        return Path.Combine(directoryOrNullForGlobal ??
-            Skatech.ComponentArchitecture.OperationGroup.ApplicationDataDirectory, fileName);
-    }
 }

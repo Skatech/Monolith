@@ -18,6 +18,28 @@ static class FilePath {
         return Path.GetFileName(directoryOrFilePath);
     }
 
+    // public static string ReplaceFileName(ReadOnlySpan<char> path, ReadOnlySpan<char> newName) {
+    //     return Path.Join(Path.GetDirectoryName(path), newName);
+    // }
+
+    public static string EnsureHasExtension(string path, ReadOnlySpan<char> defaultExt) {
+        return Path.HasExtension(path) ? path : defaultExt.StartsWith(".")
+            ? String.Concat(path, defaultExt) : String.Concat(path, ".", defaultExt);
+    }
+
+    // public static string NormalizeExtension(string extension) {
+    //     return extension.StartsWith('.') ? extension : '.' + extension;
+    // }
+
+    public static string EnsureHasRoot(string path, ReadOnlySpan<char> defaultRoot) {
+        return IsRooted(path) ? path : Path.Join(defaultRoot, path);
+    }
+
+    public static bool IsRooted(string path) {
+        return Path.IsPathRooted(path) && path.Length > 1 && // windows path fix
+            IsDirectorySeparatorChar(path[0]) == IsDirectorySeparatorChar(path[1]);
+    }
+
     ///<summary>Return parent directory, throw exception when failed</summary>
     public static string GetParentDirectory(string path) {
         return Path.GetDirectoryName(path) ??
