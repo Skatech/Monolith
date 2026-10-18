@@ -169,12 +169,13 @@ internal static class UtilityDoc {
 
         var syncIndexCache = new Dictionary<string, FileSyncIndex?>(StringComparer.OrdinalIgnoreCase);
         int reccount = 0, recmatch = 0;
+        uint availPull = 0, availPush = 0, countFail = 0;
         foreach (var record in index.Records) {
             if (argFilter.ValueOrNull is null || record.Name.StartsWith(argFilter.Value)) {
                 Console.Write($"{record.Name,-11} ");
                 if (FileSyncIndex.EnumerateUpstreamFilesForFile(record.ArchivePath, null, syncIndexCache)
                                 is IEnumerable<string> upstreamFiles) {                    
-                    uint availPull = 0, availPush = 0, countFail = 0, countSync = 0;
+                    uint countSync = 0;
                     foreach (var upstreamFile in upstreamFiles) {
                         FileSync.SyncAnnotated(record.ArchivePath, upstreamFile,
                             optDry.IsNotActive, optDry.IsNotActive, ref availPull, ref availPush, ref countFail);
@@ -196,6 +197,19 @@ internal static class UtilityDoc {
         else if (recmatch < 1) {
             Console.WriteLine("No records matching");
         }
+        if (availPull + availPush + countFail > 0) {
+            if (availPull > 0) {
+                Console.WriteLine($"{availPull} file(s) to pull");
+            }
+            if (availPush > 0) {
+                Console.WriteLine($"{availPush} file(s) to push");
+            }
+            if (countFail > 0) {
+                using var cc = ConsoleColors.FromForeground(ConsoleColor.Yellow);
+                Console.WriteLine($"{countFail} file(s) failed to update");
+            }
+        }
+        else Console.WriteLine("All files up to date");
     }
     
     static void EditDocument(IEnumerable<string> args) {
