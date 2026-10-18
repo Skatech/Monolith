@@ -19,9 +19,15 @@ static class ADocFileFormat {
     }
     
     public static void Decompress(string archiveFile, string outputFile) {
-        using var stream = CreateDecompressStream(archiveFile);
-        using var file = File.Create(outputFile);
-        stream.CopyTo(file);
+        try {
+            using var stream = CreateDecompressStream(archiveFile);
+            using var file = File.Create(outputFile);
+            stream.CopyTo(file);
+        }
+        catch {
+            File.Delete(outputFile);
+            throw;
+        }
     }
 
     public static void Compress(string sourceFile, string archiveFile) {
@@ -94,9 +100,15 @@ static class SDocFileFormat {
     }
     
     public static void Decrypt(string archiveFile, string outputFile, string password) {
-        using var stream = CreateDecryptStream(archiveFile, password);
-        using var file = File.Create(outputFile);
-        stream.CopyTo(file);
+        try {
+            using var stream = CreateDecryptStream(archiveFile, password);
+            using var file = File.Create(outputFile);
+            stream.CopyTo(file);
+        }
+        catch {
+            File.Delete(outputFile);
+            throw;
+        }
     }
 
     public static void Encrypt(string inputFile, string archiveFile, string password) {

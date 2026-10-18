@@ -173,14 +173,14 @@ internal static class UtilityDoc {
             if (argFilter.ValueOrNull is null || record.Name.StartsWith(argFilter.Value)) {
                 Console.Write($"{record.Name,-11} ");
                 if (FileSyncIndex.EnumerateUpstreamFilesForFile(record.ArchivePath, null, syncIndexCache)
-                                is IEnumerable<string> upstreamFiles) {
-                    int synccount = 0;
+                                is IEnumerable<string> upstreamFiles) {                    
+                    uint availPull = 0, availPush = 0, countFail = 0, countSync = 0;
                     foreach (var upstreamFile in upstreamFiles) {
                         FileSync.SyncAnnotated(record.ArchivePath, upstreamFile,
-                            optDry.IsNotActive, optDry.IsNotActive);
-                        synccount++;
+                            optDry.IsNotActive, optDry.IsNotActive, ref availPull, ref availPush, ref countFail);
+                        countSync++;
                     }
-                    if (synccount < 1) {
+                    if (countSync < 1) {
                         Console.WriteLine("-- (no sync records)");
                     }
                 }
@@ -224,7 +224,7 @@ internal static class UtilityDoc {
         
         var documentFile = Path.Combine(TempDirectory, record.GetExtractedFileName());
         if (File.Exists(documentFile)) {
-            Console.WriteLine("Extracted document exists. Clean first!");
+            Console.WriteLine("Extracted document already exists");
             return;
         }
         var syncIndexCache = new Dictionary<string, FileSyncIndex?>(StringComparer.OrdinalIgnoreCase);
@@ -235,18 +235,18 @@ internal static class UtilityDoc {
             }
         }
 
-        Console.Write($"Extracting \"{record.Name}\"...");
+        Console.Write($"Extracting \"{record.Name}\"... ");
         storageProvider.Restore(record.ArchivePath, documentFile);
         var createTime = File.GetLastWriteTime(documentFile);
         
-        Console.Write(" Editing...");
+        Console.Write("Editing... ");
         if (Process.Start(
             new ProcessStartInfo(documentFile) { UseShellExecute = true }) is Process editor) {
             editor.WaitForExit();
 
             if (File.Exists(documentFile)) {
                 if (createTime < File.GetLastWriteTime(documentFile)) {
-                    Console.Write(" Archiving...");
+                    Console.Write("Archiving... ");
                     string tempFile = Path.ChangeExtension(documentFile, archiveFormat);
                     storageProvider.Archive(documentFile, tempFile);
                     try {
@@ -255,14 +255,14 @@ internal static class UtilityDoc {
                     }
                     catch (Exception ex) {
                         using var cc = ConsoleColors.FromForeground(ConsoleColor.Yellow);
-                        Console.Write($" Backup...({ex.Message})");
+                        Console.Write($"Backup...({ex.Message}) ");
                     }
                     File.Move(tempFile, record.ArchivePath, true);
 
                     if (optNoSync.IsNotActive &&
                             FileSyncIndex.EnumerateUpstreamFilesForFile(record.ArchivePath,
                                 null, syncIndexCache) is IEnumerable<string> upstreamFiles) {
-                        Console.Write(" Syncronizing...");
+                        Console.Write("Syncronizing... ");
                         foreach (var upstreamFile in upstreamFiles) {
                             string? message;
                             if (FileSync.IsDriveAvailable(upstreamFile)) {

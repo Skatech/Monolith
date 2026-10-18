@@ -8,8 +8,14 @@
             "preLaunchTask": "build",
             "program": "${workspaceFolder}/.out/Monolith.dll",
             // "args": [],
-            "args": ["index"],
-            "env": { "MONOLITH_APPDATA": "./APPDATA" },
+            // "args": ["index"],
+            // "env": { "MONOLITH_APPDATA": "./APPDATA" },
+
+            // "env": { "MONOLITH_APPDATA": "%USERPROFILE%\\AppData\\Roaming\\MPC-HC\\SEC" },
+            "env": { "MONOLITH_APPDATA": "%APPDATA%\\MPC-HC\\SEC" },
+            // "args": ["doc", "nol"],
+            "args": ["sync", "c:\\Work\\Gfx\\exp"],
+
             "cwd": "${workspaceFolder}/.out/",
             "console": "integratedTerminal",
             "internalConsoleOptions": "neverOpen",

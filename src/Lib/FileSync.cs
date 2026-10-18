@@ -89,7 +89,65 @@ static class FileSync {
     }
 
     ///<summary>Syncronize files with console detailed log</summary>
-    public static void SyncAnnotated(string workingFile, string upstreamFile, bool allowPush, bool allowPull) {
+    public static void SyncAnnotated(string workingFile, string upstreamFile,
+                bool allowPush, bool allowPull, ref uint availPull, ref uint availPush, ref uint countFail) {
+        Console.Write($"{Path.GetFileName(workingFile.AsSpan()),-19} ");
+        if (IsDriveAvailable(upstreamFile)) {
+            long comp = Look(workingFile, upstreamFile);
+            if (comp < 0L) {
+                Console.Write(File.Exists(workingFile)
+                    ? "working file outdated"
+                    : "working file missing");
+                if (allowPull) {
+                    Console.Write(" - Pull... ");
+                    if (Pull(workingFile, upstreamFile) is string error) {
+                        using var cc = ConsoleColors.FromForeground(ConsoleColor.Yellow);
+                        Console.WriteLine(error);
+                        countFail++;
+                    }
+                    else Console.WriteLine("OK");
+                }
+                else {
+                    Console.WriteLine(" (pull available)");
+                    availPull++;
+                }
+            }
+            else if (comp > 0L) {
+                Console.Write(File.Exists(upstreamFile)
+                    ? "upstream file outdated"
+                    : "upstream file missing");
+                if (allowPush) {
+                    Console.Write(" - Push... ");
+                    if (Push(workingFile, upstreamFile) is string error) {
+                        using var cc = ConsoleColors.FromForeground(ConsoleColor.Yellow);
+                        Console.WriteLine(error);
+                        countFail++;
+                    }
+                    else Console.WriteLine("OK");
+                }
+                else {
+                    Console.WriteLine(" (push available)");
+                    availPush++;
+                }
+            }
+            else {
+                if (!File.Exists(workingFile)) {
+                    using var cc = ConsoleColors.FromForeground(ConsoleColor.Yellow);
+                    Console.WriteLine("both files missing");
+                    countFail++;
+                }
+                else for(int n = Console.GetCursorPosition().Left; n > 0; --n)
+                    Console.Write("\b \b");
+            }
+        }
+        else {
+            using var cc = ConsoleColors.FromForeground(ConsoleColor.DarkBlue);
+            Console.WriteLine("upstream drive offline");
+        }
+    }
+
+    ///<summary>Syncronize files with console detailed log</summary>
+    public static void SyncAnnotatedVerbose(string workingFile, string upstreamFile, bool allowPush, bool allowPull) {
         Console.Write($"{Path.GetFileName(workingFile.AsSpan()),-19} ");
         if (IsDriveAvailable(upstreamFile)) {
             long comp = Look(workingFile, upstreamFile);
@@ -180,9 +238,24 @@ class FileSyncIndex {
     public void SyncAnnotated(bool allowPush,
             bool allowPull, bool includeSubDirs, string? fileFilterPattern) {
         var ignoreList = LoadCombinedIgnoreList(IndexDir);
+        uint availPull = 0, availPush = 0, countFail = 0;
         foreach (var record in _records)
             record.SyncAnnotated(IndexDir, allowPush, allowPull,
-                    includeSubDirs, fileFilterPattern, ignoreList);
+                    includeSubDirs, fileFilterPattern, ignoreList,
+                    ref availPull, ref availPush, ref countFail);
+        if (availPull + availPush + countFail > 0) {
+            if (availPull > 0) {
+                Console.WriteLine($"{availPull} file(s) to pull");
+            }
+            if (availPush > 0) {
+                Console.WriteLine($"{availPush} file(s) to push");
+            }
+            if (countFail > 0) {
+                using var cc = ConsoleColors.FromForeground(ConsoleColor.Yellow);
+                Console.WriteLine($"{countFail} file(s) failed to update");
+            }
+        }
+        else Console.WriteLine("All files up to date");
     }
 
     ///<summary>Open index file in editor</summary>
@@ -327,7 +400,8 @@ class FileSyncIndex {
 
         ///<summary>Syncronize files with console detailed log</summary>
         public void SyncAnnotated(string workingDir, bool allowPush, bool allowPull,
-                    bool includeSubDirs, string? fileFilterPattern, FileList? ignoreList) {
+                    bool includeSubDirs, string? fileFilterPattern, FileList? ignoreList,
+                    ref uint availPull, ref uint availPush, ref uint countFail) {
             Console.WriteLine($"{workingDir}\\{FileSelector}  -->  {UpstreamDirectory}");
             int filecount = 0, filematch = 0;
             foreach(var fileName in FileSync.EnumerateMatchingFiles(
@@ -339,7 +413,8 @@ class FileSyncIndex {
                 if (FilePath.IsMatch(Path.GetFileName(fileName.AsSpan()), fileFilterPattern)) {
                     Console.Write("    ");
                     FileSync.SyncAnnotated(Path.Join(workingDir, fileName),
-                        Path.Join(UpstreamDirectory, fileName), allowPush, allowPull);
+                        Path.Join(UpstreamDirectory, fileName), allowPush, allowPull,
+                            ref availPull, ref availPush, ref countFail);
                     filematch++;
                 }
                 filecount++;
