@@ -11,8 +11,8 @@
         <NeutralLanguage>en-US</NeutralLanguage>
         <Company>Skatech</Company>
         <Product>Monolith</Product>
-        <AssemblyVersion>2.12</AssemblyVersion>
-        <FileVersion>2.12</FileVersion>
+        <AssemblyVersion>2.13</AssemblyVersion>
+        <FileVersion>2.13</FileVersion>
     </PropertyGroup>
 
     <ItemGroup>

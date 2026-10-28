@@ -8,8 +8,11 @@
             "preLaunchTask": "build",
             "program": "${workspaceFolder}/.out/Monolith.dll",
             // "args": [],
-            "args": ["index"],
-            "env": { "MONOLITH_APPDATA": "./APPDATA" },
+            // "args": ["index"],
+            // "env": { "MONOLITH_APPDATA": "./APPDATA" },
+            
+            "env": { "MONOLITH_APPDATA": "%APPDATA%\\MPC-HC\\SEC" },
+            "args": ["flake", "C:\\Work\\Gfx\\exp", "-o"],
 
             "cwd": "${workspaceFolder}/.out/",
             "console": "integratedTerminal",
